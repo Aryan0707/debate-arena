@@ -46,6 +46,60 @@ _STUB_OPENINGS: dict[str, str] = {
         "**Concrete next steps:**\n{steps}\n\n"
         "**What would change my mind:** {falsifier}"
     ),
+    "hacker": (
+        "Okay, here's the hack on '{question}': the {payoff_evidence}x play is to "
+        "skip the {phase1} and just {phase2} in a weekend. The asymmetry is that "
+        "everyone else is still debating — by the time the {response_pattern} crowd "
+        "even understands the question, we've already shipped. The leverage is in "
+        "{biggest_leverage}. Boring, safe, 'responsible' approaches are how you "
+        "compete on price. Weird + fast is how you set the terms. Move now, fix later."
+    ),
+    "regulator": (
+        "Before we proceed on '{question}', we should consider: who is accountable, "
+        "who is liable, and what's the worst-case regulatory action? {failure_mode} "
+        "looks benign until you map it to {competitor_pressure}, which has been "
+        "enforced {payoff_evidence}x in the last 18 months. The mitigation is "
+        "{phase1} plus a documented audit trail — {cost}, not a blocker. If we "
+        "can't produce that, the {response_pattern} risk is the kind of thing that "
+        "ends companies. Be specific about compliance, not just 'we'll be careful.'"
+    ),
+    "philosopher": (
+        "Step back for a moment on '{question}'. The question itself assumes "
+        "{skeptic_concern}, but is that the right frame? What kind of world are we "
+        "building if we say yes? In 10 years, who benefits, who pays, and what does "
+        "success actually look like? The {response_pattern} pattern has historically "
+        "produced {alt_scenario} when not checked by values. The engineer's plan may "
+        "work, but works at what cost? The non-obvious question isn't 'how do we "
+        "ship' — it's 'what are we becoming as we ship.'"
+    ),
+    "trader": (
+        "Let me put some numbers on '{question}'. The expected value here is "
+        "asymmetric — {payoff_evidence}x upside on a {cost} position, with "
+        "downside bounded by {failure_mode}. Kelly fraction suggests sizing at "
+        "{maintenance} of available capital. The convex/concave question: is this "
+        "a fat-tail bet (good) or a steady-state trade (mediocre)? Time horizon "
+        "matters — if the {competitor_pressure} clock is 12 months, the "
+        "option value of waiting is low. Position: take the bet, size it "
+        "appropriately, define the exit before entry."
+    ),
+    "customer": (
+        "On '{question}', let me ground this in real humans. Imagine Sarah, 34, "
+        "marketing manager, on her third coffee. Would she even notice this "
+        "decision? Would she care? The honest answer is usually 'no' — and that "
+        "should worry us. The {skeptic_concern} matters if it shows up in her "
+        "Monday morning, not in our quarterly review. {failure_mode} is a "
+        "technical problem. The real question: would I recommend this to a "
+        "friend? If I can't answer that in 5 seconds, we're not done thinking."
+    ),
+    "first-principles": (
+        "On '{question}', let's separate what we know from what we're assuming. "
+        "The premise of the question — that {skeptic_concern} is the dominant "
+        "variable — is asserted, not demonstrated. What's the actual mechanism? "
+        "What evidence supports it beyond convention? The other personas are "
+        "treating {failure_mode} as given, but if {alt_scenario}, the entire "
+        "framing collapses. We have one observation, not a law. Strip away the "
+        "unstated assumptions and the answer may be very different."
+    ),
 }
 
 _FILLERS = {

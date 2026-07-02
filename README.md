@@ -21,13 +21,21 @@ debate --provider openrouter --model anthropic/claude-3.5-sonnet "Best stack for
 debate --demo "What's the meaning of life?"
 ```
 
-## 🎭 Built-in personas
+## 🎭 Personas (11 built-in)
 
 - **Skeptic** — pokes holes, demands evidence, plays devil's advocate
 - **Optimist** — sees upside, advocates bold action
 - **Engineer** — focuses on feasibility, cost, maintenance, scaling
 - **Strategist** — long-term, second-order effects, game theory
-- *(add your own in `personas/*.yaml`)*
+- **Moderator** — synthesizes the debate into a final answer
+- **Hacker** — looks for exploits, leverage, asymmetric plays, clever workarounds
+- **Regulator** — compliance, legal risk, public policy, societal effects
+- **Philosopher** — long-term ethics, deeper meaning, reframes the question
+- **Trader** — financial risk, market timing, expected value, position sizing
+- **Customer** — voice of the actual end user, grounds debates in real humans
+- **First Principles** — strips away assumptions, rebuilds from ground truth
+
+Mix and match — try `--personas hacker,regulator,engineer,customer` for a really spicy take on a product decision, or `--personas philosopher,trader,first-principles` for a strategic question.
 
 ## 🔁 Debate flow
 
