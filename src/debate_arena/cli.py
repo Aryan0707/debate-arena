@@ -126,6 +126,7 @@ def main(
     if quiet:
         # Patch the console to be silent.
         from rich.console import Console
+
         prov_console = Console(file=open("/dev/null", "w"))
     else:
         prov_console = None

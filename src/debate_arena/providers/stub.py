@@ -209,14 +209,16 @@ _FILLERS = {
 
 def _fill(template: str) -> str:
     """Substitute {key} placeholders with random fillers."""
+
     def repl(match: re.Match) -> str:
         key = match.group(1)
         if key == "question":
-            return match.string[match.start():match.end()]  # leave as-is, caller fills
+            return match.string[match.start() : match.end()]  # leave as-is, caller fills
         choices = _FILLERS.get(key)
         if not choices:
             return match.group(0)
         return random.choice(choices)
+
     return re.sub(r"\{(\w+)\}", repl, template)
 
 

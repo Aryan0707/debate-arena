@@ -10,17 +10,19 @@ from debate_arena import DebateArena, DebateConfig
 from debate_arena.providers import StubProvider
 
 # A real question worth debating
-question = "Should an early-stage startup build with no-code tools or invest in custom code from day 1?"
+question = (
+    "Should an early-stage startup build with no-code tools or invest in custom code from day 1?"
+)
 
 arena = DebateArena(
     provider=StubProvider(),  # swap for AnthropicProvider(model="claude-3-5-sonnet-20241022")
-    stream=False,             # don't print the panels, just run silently
+    stream=False,  # don't print the panels, just run silently
 )
 
 config = DebateConfig(
     question=question,
     personas=["skeptic", "optimist", "engineer", "strategist"],
-    rounds=2,                 # two crossfire rounds for a deeper debate
+    rounds=2,  # two crossfire rounds for a deeper debate
     model=None,
 )
 

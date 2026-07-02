@@ -62,5 +62,8 @@ def test_stub_provider_can_generate_for_new_persona(pid):
 def test_total_persona_count_is_eleven():
     """Sanity: we should now have 11 personas (5 original + 6 new)."""
     from debate_arena.personas import PERSONAS_DIR
+
     yaml_files = list(PERSONAS_DIR.glob("*.yaml"))
-    assert len(yaml_files) == 11, f"expected 11 personas, found {len(yaml_files)}: {[p.stem for p in yaml_files]}"
+    assert len(yaml_files) == 11, (
+        f"expected 11 personas, found {len(yaml_files)}: {[p.stem for p in yaml_files]}"
+    )

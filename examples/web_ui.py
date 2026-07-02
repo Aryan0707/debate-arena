@@ -28,17 +28,33 @@ DEFAULT_PERSONAS = ["skeptic", "optimist", "engineer"]
 
 # Visual config for persona cards
 PERSONA_META = {
-    "skeptic":          {"emoji": "🔍", "tagline": "Pokes holes, demands evidence",       "color": "#ef4444"},
-    "optimist":         {"emoji": "🚀", "tagline": "Sees upside, advocates bold action",   "color": "#f59e0b"},
-    "engineer":         {"emoji": "🔨", "tagline": "Feasibility, cost, scaling",           "color": "#3b82f6"},
-    "strategist":       {"emoji": "♟️", "tagline": "Long-term, game theory, 2nd order",     "color": "#8b5cf6"},
-    "moderator":        {"emoji": "⚖️", "tagline": "Synthesizes the final answer",         "color": "#10b981"},
-    "hacker":           {"emoji": "💻", "tagline": "Leverage, exploits, asymmetric plays", "color": "#ec4899"},
-    "regulator":        {"emoji": "📜", "tagline": "Compliance, legal risk, policy",       "color": "#6366f1"},
-    "philosopher":      {"emoji": "🏛️", "tagline": "Ethics, meaning, reframes the Q",      "color": "#14b8a6"},
-    "trader":           {"emoji": "📈", "tagline": "Expected value, position sizing",      "color": "#84cc16"},
-    "customer":         {"emoji": "👤", "tagline": "Voice of the actual end user",         "color": "#f97316"},
-    "first-principles": {"emoji": "🧬", "tagline": "Strips assumptions, demands rigor",    "color": "#06b6d4"},
+    "skeptic": {"emoji": "🔍", "tagline": "Pokes holes, demands evidence", "color": "#ef4444"},
+    "optimist": {
+        "emoji": "🚀",
+        "tagline": "Sees upside, advocates bold action",
+        "color": "#f59e0b",
+    },
+    "engineer": {"emoji": "🔨", "tagline": "Feasibility, cost, scaling", "color": "#3b82f6"},
+    "strategist": {
+        "emoji": "♟️",
+        "tagline": "Long-term, game theory, 2nd order",
+        "color": "#8b5cf6",
+    },
+    "moderator": {"emoji": "⚖️", "tagline": "Synthesizes the final answer", "color": "#10b981"},
+    "hacker": {
+        "emoji": "💻",
+        "tagline": "Leverage, exploits, asymmetric plays",
+        "color": "#ec4899",
+    },
+    "regulator": {"emoji": "📜", "tagline": "Compliance, legal risk, policy", "color": "#6366f1"},
+    "philosopher": {"emoji": "🏛️", "tagline": "Ethics, meaning, reframes the Q", "color": "#14b8a6"},
+    "trader": {"emoji": "📈", "tagline": "Expected value, position sizing", "color": "#84cc16"},
+    "customer": {"emoji": "👤", "tagline": "Voice of the actual end user", "color": "#f97316"},
+    "first-principles": {
+        "emoji": "🧬",
+        "tagline": "Strips assumptions, demands rigor",
+        "color": "#06b6d4",
+    },
 }
 
 
@@ -181,7 +197,9 @@ def run_debate(
                 )
 
                 others = [t for t in transcript if t.persona != persona.id]
-                recent = others[-len(personas_objs):] if len(others) >= len(personas_objs) else others
+                recent = (
+                    others[-len(personas_objs) :] if len(others) >= len(personas_objs) else others
+                )
                 prior_text = [f"[{t.persona}]\n{t.content}" for t in recent]
 
                 turn = arena._run_turn(
@@ -485,15 +503,18 @@ def build_ui() -> gr.Blocks:
                 gr.Markdown('<div class="section-label">⚙️ Settings</div>')
                 with gr.Group():
                     rounds = gr.Slider(
-                        minimum=0, maximum=3, step=1, value=1,
+                        minimum=0,
+                        maximum=3,
+                        step=1,
+                        value=1,
                         label="Crossfire rounds",
                         info="0 = opening only · 3 = extended back-and-forth",
                     )
                     use_demo = gr.Checkbox(
                         label="Demo mode (no API key needed)",
                         value=not any(
-                            os.environ.get(k) for k in
-                            ["ANTHROPIC_API_KEY", "OPENAI_API_KEY", "OPENROUTER_API_KEY"]
+                            os.environ.get(k)
+                            for k in ["ANTHROPIC_API_KEY", "OPENAI_API_KEY", "OPENROUTER_API_KEY"]
                         ),
                     )
                 with gr.Group():
@@ -549,16 +570,41 @@ def build_ui() -> gr.Blocks:
         # === EXAMPLES ===
         gr.Examples(
             examples=[
-                ["Should I quit my job to start an AI company?", DEFAULT_PERSONAS, 1, "anthropic", ""],
-                ["Best stack for a SaaS MVP in 2026?",
-                 ["skeptic", "engineer", "strategist"], 2, "anthropic", ""],
-                ["Will AI replace programmers in 5 years?",
-                 ["skeptic", "optimist", "engineer", "strategist"], 2, "openrouter",
-                 "anthropic/claude-3.5-sonnet"],
-                ["Should we launch a crypto token?",
-                 ["hacker", "regulator", "customer"], 1, "ollama", ""],
-                ["Best investment for a 30-year-old with $50k?",
-                 ["trader", "first-principles", "philosopher"], 2, "anthropic", ""],
+                [
+                    "Should I quit my job to start an AI company?",
+                    DEFAULT_PERSONAS,
+                    1,
+                    "anthropic",
+                    "",
+                ],
+                [
+                    "Best stack for a SaaS MVP in 2026?",
+                    ["skeptic", "engineer", "strategist"],
+                    2,
+                    "anthropic",
+                    "",
+                ],
+                [
+                    "Will AI replace programmers in 5 years?",
+                    ["skeptic", "optimist", "engineer", "strategist"],
+                    2,
+                    "openrouter",
+                    "anthropic/claude-3.5-sonnet",
+                ],
+                [
+                    "Should we launch a crypto token?",
+                    ["hacker", "regulator", "customer"],
+                    1,
+                    "ollama",
+                    "",
+                ],
+                [
+                    "Best investment for a 30-year-old with $50k?",
+                    ["trader", "first-principles", "philosopher"],
+                    2,
+                    "anthropic",
+                    "",
+                ],
             ],
             inputs=[question, personas, rounds, provider_name, model],
             label="💡 Try one of these",

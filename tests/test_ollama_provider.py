@@ -55,29 +55,31 @@ def test_ollama_provider_uses_explicit_model_over_env():
 def test_detect_provider_prefers_ollama_when_no_keys_set():
     """If no API keys are set but ollama is running, use ollama."""
     env = {
-        k: "" for k in [
-            "ANTHROPIC_API_KEY", "OPENAI_API_KEY", "OPENROUTER_API_KEY",
+        k: ""
+        for k in [
+            "ANTHROPIC_API_KEY",
+            "OPENAI_API_KEY",
+            "OPENROUTER_API_KEY",
             "DEBATE_PROVIDER",
         ]
     }
     with patch.dict("os.environ", env, clear=True):
-        with patch(
-            "debate_arena.providers.factory._ollama_reachable", return_value=True
-        ):
+        with patch("debate_arena.providers.factory._ollama_reachable", return_value=True):
             assert detect_provider() == "ollama"
 
 
 def test_detect_provider_falls_back_to_stub_when_nothing_available():
     env = {
-        k: "" for k in [
-            "ANTHROPIC_API_KEY", "OPENAI_API_KEY", "OPENROUTER_API_KEY",
+        k: ""
+        for k in [
+            "ANTHROPIC_API_KEY",
+            "OPENAI_API_KEY",
+            "OPENROUTER_API_KEY",
             "DEBATE_PROVIDER",
         ]
     }
     with patch.dict("os.environ", env, clear=True):
-        with patch(
-            "debate_arena.providers.factory._ollama_reachable", return_value=False
-        ):
+        with patch("debate_arena.providers.factory._ollama_reachable", return_value=False):
             assert detect_provider() == "stub"
 
 
@@ -86,6 +88,7 @@ def test_ollama_unreachable_raises_clear_error():
     p = OllamaProvider()
     with patch("httpx.Client.get") as mock_get:
         import httpx
+
         mock_get.side_effect = httpx.ConnectError("connection refused")
         with pytest.raises(ProviderError, match="ollama serve"):
             p._check_server()
@@ -95,6 +98,7 @@ def test_ollama_server_error_raises_clear_error():
     p = OllamaProvider()
     with patch("httpx.Client.get") as mock_get:
         from unittest.mock import MagicMock
+
         resp = MagicMock()
         resp.status_code = 500
         mock_get.return_value = resp

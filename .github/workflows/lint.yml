@@ -22,11 +22,11 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
-      - name: Install ruff
-        run: pip install ruff
+      - name: Install package + dev deps
+        run: pip install -e ".[dev,web]"
+
       - name: Run ruff check
         run: ruff check src tests examples
+
       - name: Run ruff format (check only)
-        run: |
-          pip install ruff
-          ruff format --check src tests examples
+        run: ruff format --check src tests examples

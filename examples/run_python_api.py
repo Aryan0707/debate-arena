@@ -50,6 +50,7 @@ def main() -> int:
 
     if args.export:
         from pathlib import Path
+
         Path(args.export).write_text(result.to_markdown())
         print(f"\nExported to {args.export}")
 

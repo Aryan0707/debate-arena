@@ -75,7 +75,7 @@ def test_generator_transcript_grows_monotonically():
     md_lengths = [len(y[2]) for y in yields]
     for i in range(1, len(md_lengths)):
         assert md_lengths[i] >= md_lengths[i - 1], (
-            f"transcript shrank at yield {i}: {md_lengths[i-1]} -> {md_lengths[i]}"
+            f"transcript shrank at yield {i}: {md_lengths[i - 1]} -> {md_lengths[i]}"
         )
     assert md_lengths[-1] > md_lengths[0] + 500
 
@@ -145,6 +145,7 @@ def test_generator_demo_mode_uses_stub():
 
 def test_build_ui_constructs_gradio_blocks():
     import gradio as gr
+
     demo = build_ui()
     assert isinstance(demo, gr.Blocks)
 

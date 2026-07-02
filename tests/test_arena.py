@@ -97,9 +97,7 @@ def test_synthesis_failure_does_not_crash():
             return Completion(content="ok", model="broken")
 
     arena = DebateArena(BrokenProvider(), console=_silent_console())
-    result = arena.run(
-        DebateConfig(question="Q", personas=["skeptic"], rounds=0)
-    )
+    result = arena.run(DebateConfig(question="Q", personas=["skeptic"], rounds=0))
     assert result.synthesis is None
     # But the opening turn should still be there.
     assert len(result.transcript) == 1

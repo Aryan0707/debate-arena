@@ -10,9 +10,7 @@ class DebateConfig:
     """Configuration for a single debate run."""
 
     question: str
-    personas: list[str] = field(
-        default_factory=lambda: ["skeptic", "optimist", "engineer"]
-    )
+    personas: list[str] = field(default_factory=lambda: ["skeptic", "optimist", "engineer"])
     rounds: int = 1
     moderator: str = "moderator"
     include_synthesis: bool = True

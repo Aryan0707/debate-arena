@@ -35,14 +35,18 @@ __all__ = [
 def __getattr__(name: str):  # pragma: no cover
     if name == "AnthropicProvider":
         from debate_arena.providers.anthropic import AnthropicProvider
+
         return AnthropicProvider
     if name == "OpenAIProvider":
         from debate_arena.providers.openai import OpenAIProvider
+
         return OpenAIProvider
     if name == "OpenRouterProvider":
         from debate_arena.providers.openrouter import OpenRouterProvider
+
         return OpenRouterProvider
     if name == "OllamaProvider":
         from debate_arena.providers.ollama import OllamaProvider
+
         return OllamaProvider
     raise AttributeError(f"module {__name__!r} has no attribute {name!r}")

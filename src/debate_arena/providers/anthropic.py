@@ -84,15 +84,11 @@ class AnthropicProvider:
             raise ProviderError(f"Anthropic request failed: {e}") from e
 
         if resp.status_code >= 400:
-            raise ProviderError(
-                f"Anthropic API error {resp.status_code}: {resp.text[:500]}"
-            )
+            raise ProviderError(f"Anthropic API error {resp.status_code}: {resp.text[:500]}")
 
         data = resp.json()
         content_blocks = data.get("content", [])
-        text = "".join(
-            b.get("text", "") for b in content_blocks if b.get("type") == "text"
-        )
+        text = "".join(b.get("text", "") for b in content_blocks if b.get("type") == "text")
         usage = data.get("usage", {})
         return Completion(
             content=text,

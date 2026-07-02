@@ -61,9 +61,7 @@ class DebateArena:
                 max_tokens=1024,
             )
         except ProviderError as e:
-            raise ProviderError(
-                f"{persona.name} ({phase}, round {round_num}) failed: {e}"
-            ) from e
+            raise ProviderError(f"{persona.name} ({phase}, round {round_num}) failed: {e}") from e
 
         return PersonaTurn(
             persona=persona.id,
@@ -117,9 +115,7 @@ class DebateArena:
                 others = [t for t in transcript if t.persona != persona.id]
                 # Only show the most recent round's content to keep context focused.
                 recent = others[-len(personas) :] if len(others) >= len(personas) else others
-                prior_text = [
-                    f"[{t.persona}]\n{t.content}" for t in recent
-                ]
+                prior_text = [f"[{t.persona}]\n{t.content}" for t in recent]
                 turn = self._run_turn(
                     persona=persona,
                     question=config.question,
@@ -147,8 +143,7 @@ class DebateArena:
                 moderator = load_personas(["engineer"])[0]
 
             full_transcript_text = "\n\n---\n\n".join(
-                f"[{t.persona} — round {t.round} · {t.phase}]\n{t.content}"
-                for t in transcript
+                f"[{t.persona} — round {t.round} · {t.phase}]\n{t.content}" for t in transcript
             )
             synth_messages: list[Message] = [
                 Message(role="system", content=moderator.system_prompt),

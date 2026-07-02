@@ -51,6 +51,7 @@ def test_anthropic_provider_requires_key(monkeypatch):
     monkeypatch.delenv("ANTHROPIC_API_KEY", raising=False)
     with pytest.raises(Exception, match="ANTHROPIC_API_KEY"):
         from debate_arena.providers import get_provider
+
         get_provider("anthropic")
 
 
@@ -58,6 +59,7 @@ def test_openai_provider_requires_key(monkeypatch):
     monkeypatch.delenv("OPENAI_API_KEY", raising=False)
     with pytest.raises(Exception, match="OPENAI_API_KEY"):
         from debate_arena.providers import get_provider
+
         get_provider("openai")
 
 
@@ -65,4 +67,5 @@ def test_openrouter_provider_requires_key(monkeypatch):
     monkeypatch.delenv("OPENROUTER_API_KEY", raising=False)
     with pytest.raises(Exception, match="OPENROUTER_API_KEY"):
         from debate_arena.providers import get_provider
+
         get_provider("openrouter")

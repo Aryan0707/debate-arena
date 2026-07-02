@@ -68,9 +68,7 @@ class OpenAIProvider:
             raise ProviderError(f"OpenAI request failed: {e}") from e
 
         if resp.status_code >= 400:
-            raise ProviderError(
-                f"OpenAI API error {resp.status_code}: {resp.text[:500]}"
-            )
+            raise ProviderError(f"OpenAI API error {resp.status_code}: {resp.text[:500]}")
 
         data = resp.json()
         try:

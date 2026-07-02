@@ -37,6 +37,7 @@ def detect_provider(name: str | None = None) -> str:
 def _ollama_reachable() -> bool:
     """Quick check: is an Ollama server running locally?"""
     import socket
+
     host = os.environ.get("OLLAMA_HOST", "http://127.0.0.1:11434")
     # Parse host:port from the URL
     try:
@@ -58,21 +59,24 @@ def get_provider(name: str | None = None, *, model: str | None = None) -> Provid
 
     if target == "anthropic":
         from debate_arena.providers.anthropic import AnthropicProvider
+
         return AnthropicProvider(model=model)
     if target == "openai":
         from debate_arena.providers.openai import OpenAIProvider
+
         return OpenAIProvider(model=model)
     if target == "openrouter":
         from debate_arena.providers.openrouter import OpenRouterProvider
+
         return OpenRouterProvider(model=model)
     if target == "ollama":
         from debate_arena.providers.ollama import OllamaProvider
+
         return OllamaProvider(model=model)
     if target == "stub":
         return StubProvider()
     raise ValueError(
-        f"unknown provider: {target!r}. "
-        f"Choose one of: anthropic, openai, openrouter, ollama, stub"
+        f"unknown provider: {target!r}. Choose one of: anthropic, openai, openrouter, ollama, stub"
     )
 
 
