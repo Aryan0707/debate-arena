@@ -15,6 +15,7 @@ from debate_arena.providers.stub import StubProvider
 
 __all__ = [
     "Message",
+    "OllamaProvider",
     "Provider",
     "ProviderError",
     "StubProvider",
@@ -23,6 +24,7 @@ __all__ = [
     "detect_provider",
     "get_provider",
     "list_providers",
+    "ollama",
     "openai",
     "openrouter",
     "stub",
@@ -40,4 +42,7 @@ def __getattr__(name: str):  # pragma: no cover
     if name == "OpenRouterProvider":
         from debate_arena.providers.openrouter import OpenRouterProvider
         return OpenRouterProvider
+    if name == "OllamaProvider":
+        from debate_arena.providers.ollama import OllamaProvider
+        return OllamaProvider
     raise AttributeError(f"module {__name__!r} has no attribute {name!r}")

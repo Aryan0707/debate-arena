@@ -17,9 +17,11 @@ from debate_arena.providers import detect_provider, get_provider
 @click.option(
     "-p",
     "--provider",
-    type=click.Choice(["anthropic", "openai", "openrouter", "stub"], case_sensitive=False),
+    type=click.Choice(
+        ["anthropic", "openai", "openrouter", "ollama", "stub"], case_sensitive=False
+    ),
     default=None,
-    help="LLM provider (default: auto-detect from env vars, then stub).",
+    help="LLM provider (default: auto-detect from env vars, then ollama if running, then stub).",
 )
 @click.option(
     "-m",

@@ -1,5 +1,7 @@
 """Tests for the provider factory / auto-detection."""
 
+from unittest.mock import patch
+
 import pytest
 
 from debate_arena.providers import StubProvider, detect_provider, get_provider, list_providers
@@ -10,7 +12,9 @@ def test_detect_stub_when_no_env(monkeypatch):
     monkeypatch.delenv("OPENAI_API_KEY", raising=False)
     monkeypatch.delenv("OPENROUTER_API_KEY", raising=False)
     monkeypatch.delenv("DEBATE_PROVIDER", raising=False)
-    assert detect_provider() == "stub"
+    # Make ollama look unreachable so we hit the stub fallback
+    with patch("debate_arena.providers.factory._ollama_reachable", return_value=False):
+        assert detect_provider() == "stub"
 
 
 def test_explicit_name_overrides(monkeypatch):

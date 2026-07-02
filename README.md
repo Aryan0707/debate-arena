@@ -49,6 +49,38 @@ debate --export debate.md "..."                  # save full transcript
 debate --demo "..."                              # no API, local stubs
 ```
 
+## 🦙 Local models with Ollama (free, private, offline)
+
+If you have [Ollama](https://ollama.ai) installed and running locally, the
+debate arena auto-detects it — no API key required:
+
+```bash
+# Install Ollama (Mac)
+brew install ollama
+
+# Pull a model
+ollama pull llama3.2
+
+# Use it (auto-detected, or explicit)
+debate --provider ollama --model llama3.2 "Your question"
+debate -p ollama -m qwen2.5:7b --rounds 2 "Your question"
+
+# Set defaults via env vars
+export OLLAMA_MODEL=qwen2.5:7b
+export OLLAMA_HOST=http://my-ollama-server:11434   # if remote
+```
+
+The first call to a model can take 10-30s while Ollama loads it into RAM.
+Subsequent calls are fast. The provider's timeout is bumped to 5 minutes
+to handle cold loads on large models.
+
+Recommended models for debate (good at following persona instructions):
+- `llama3.2` (3B) — fast, surprisingly good, runs on any Mac
+- `qwen2.5:7b` — better reasoning, needs ~6GB RAM
+- `mistral` (7B) — strong all-rounder
+- `qwen2.5:14b` — best quality under 16GB RAM
+
+
 ## 🌐 Web UI
 
 A Gradio UI ships with the project:
