@@ -1,0 +1,84 @@
+{
+  "presets": [
+    {
+      "id": "product_decision",
+      "name": "Product Decision",
+      "emoji": "🚀",
+      "description": "Should we ship this feature?",
+      "example_question": "Should we launch our new AI feature next month?",
+      "personas": ["engineer", "customer", "hacker", "regulator"],
+      "rounds": 1,
+      "color": "#3b82f6"
+    },
+    {
+      "id": "career_choice",
+      "name": "Career Choice",
+      "emoji": "🧭",
+      "description": "Big life/career decision",
+      "example_question": "Should I quit my job to start my own company?",
+      "personas": ["skeptic", "optimist", "trader", "philosopher"],
+      "rounds": 1,
+      "color": "#10b981"
+    },
+    {
+      "id": "strategic_bet",
+      "name": "Strategic Bet",
+      "emoji": "♟️",
+      "description": "Long-term strategic move",
+      "example_question": "Should we expand into the European market in 2027?",
+      "personas": ["strategist", "trader", "first-principles", "philosopher"],
+      "rounds": 2,
+      "color": "#8b5cf6"
+    },
+    {
+      "id": "code_review",
+      "name": "Code Review",
+      "emoji": "🔨",
+      "description": "Should we rewrite this?",
+      "example_question": "Should we rewrite our auth system from scratch, or incrementally refactor it?",
+      "personas": ["engineer", "hacker", "regulator", "customer"],
+      "rounds": 1,
+      "color": "#f59e0b"
+    },
+    {
+      "id": "investment",
+      "name": "Investment",
+      "emoji": "📈",
+      "description": "Where to put my money",
+      "example_question": "Where should I invest $50k for the next 5 years?",
+      "personas": ["trader", "first-principles", "philosopher", "strategist"],
+      "rounds": 2,
+      "color": "#84cc16"
+    },
+    {
+      "id": "wildcard",
+      "name": "Wild Card",
+      "emoji": "🎲",
+      "description": "Maximum drama, minimum agreement",
+      "example_question": "Will AGI happen in the next 5 years?",
+      "personas": ["hacker", "philosopher", "trader", "first-principles", "skeptic", "optimist"],
+      "rounds": 2,
+      "color": "#ec4899"
+    },
+    {
+      "id": "user_research",
+      "name": "User Research",
+      "emoji": "👤",
+      "description": "What do users actually want?",
+      "example_question": "Why are users churning from our SaaS after the free trial?",
+      "personas": ["customer", "engineer", "optimist", "skeptic"],
+      "rounds": 1,
+      "color": "#f97316"
+    },
+    {
+      "id": "ethical_dilemma",
+      "name": "Ethical Dilemma",
+      "emoji": "🏛️",
+      "description": "Hard right-vs-right choice",
+      "example_question": "Should we use customer data to train our AI models, even with anonymization?",
+      "personas": ["philosopher", "regulator", "customer", "first-principles"],
+      "rounds": 2,
+      "color": "#14b8a6"
+    }
+  ]
+}

@@ -22,7 +22,10 @@ import gradio as gr
 from debate_arena import DebateArena, DebateConfig
 from debate_arena.models import PersonaTurn
 from debate_arena.personas import PERSONAS_DIR
+from debate_arena.presets import load_presets
 from debate_arena.providers import detect_provider, get_provider
+
+PRESETS = load_presets()
 
 AVAILABLE_PERSONAS = sorted(p.stem for p in PERSONAS_DIR.glob("*.yaml"))
 DEFAULT_PERSONAS = ["skeptic", "optimist", "engineer"]
@@ -59,6 +62,32 @@ PERSONA_META = {
 }
 
 
+def apply_preset(preset_id: str) -> tuple[str, list[str], int, str, str]:
+    """Look up a preset and return (question, personas, rounds, status_banner, active_id).
+
+    Returns the new values for the question field, persona checkboxes, rounds slider,
+    a status banner confirming the preset was applied, and the preset id to record
+    as the active one.
+    """
+    if not preset_id:
+        return gr.update(), gr.update(), gr.update(), "", ""
+    from debate_arena.presets import get_preset
+    preset = get_preset(preset_id)
+    if not preset:
+        return gr.update(), gr.update(), gr.update(), "", ""
+    banner = (
+        f'<div class="status-banner info">⚡ <strong>{preset.emoji} {preset.name}</strong> preset applied. '
+        f'Edit anything below before hitting Start.</div>'
+    )
+    return (
+        preset.example_question,
+        preset.personas,
+        preset.rounds,
+        banner,
+        preset.id,
+    )
+
+
 def render_persona_chips(selected: list[str]) -> str:
     """Render selected personas as colored HTML chips for display above the run button."""
     if not selected:
@@ -74,6 +103,23 @@ def render_persona_chips(selected: list[str]) -> str:
             f"</span>"
         )
     return f'<div class="chips-row">{"".join(chips)}</div>'
+
+
+def render_preset_chips() -> str:
+    """Render the preset buttons as a horizontal row of clickable cards."""
+    if not PRESETS:
+        return ""
+    cards = []
+    for preset in PRESETS:
+        cards.append(
+            f'<button type="button" class="preset-card" data-preset-id="{preset.id}" '
+            f'style="--accent: {preset.color}">'
+            f'<span class="preset-emoji">{preset.emoji}</span>'
+            f'<span class="preset-name">{preset.name}</span>'
+            f'<span class="preset-desc">{preset.description}</span>'
+            f"</button>"
+        )
+    return f'<div class="preset-row">{"".join(cards)}</div>'
 
 
 def persona_choices_with_meta() -> list[tuple[str, str]]:
@@ -489,6 +535,53 @@ CUSTOM_CSS = """
     font-size: 0.95rem !important;
 }
 
+/* === PRESET CARDS === */
+.preset-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin: 0.5rem 0 1rem;
+}
+.preset-card {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0.85rem;
+    background: white;
+    color: var(--accent, #6366f1);
+    border: 1.5px solid color-mix(in srgb, var(--accent, #6366f1) 30%, white);
+    border-radius: 10px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s;
+    text-align: left;
+}
+.preset-card:hover {
+    background: color-mix(in srgb, var(--accent, #6366f1) 8%, white);
+    border-color: var(--accent, #6366f1);
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px color-mix(in srgb, var(--accent, #6366f1) 20%, transparent);
+}
+.preset-card:active,
+.preset-card.clicked {
+    background: color-mix(in srgb, var(--accent, #6366f1) 15%, white);
+    transform: translateY(0);
+}
+.preset-emoji {
+    font-size: 1.15rem;
+    line-height: 1;
+}
+.preset-name {
+    font-weight: 700;
+}
+.preset-desc {
+    color: #64748b;
+    font-weight: 400;
+    font-size: 0.8rem;
+    margin-left: 0.25rem;
+}
+
 /* === PRIMARY BUTTON === */
 .primary-btn {
     background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%) !important;
@@ -560,6 +653,22 @@ CUSTOM_CSS = """
 """
 
 
+PRESET_CLICK_JS = """
+<script>
+document.addEventListener('click', function(e) {
+    const card = e.target.closest('.preset-card');
+    if (!card) return;
+    document.querySelectorAll('.preset-card.clicked').forEach(function(c) {
+        c.classList.remove('clicked');
+    });
+    card.classList.add('clicked');
+    const wrapper = card.closest('[id^="component-"]');
+    if (wrapper) wrapper.click();
+});
+</script>
+"""
+
+
 def build_ui() -> gr.Blocks:
     """Construct the professional Gradio interface."""
     with gr.Blocks(
@@ -576,6 +685,14 @@ def build_ui() -> gr.Blocks:
             </div>
             """
         )
+
+        # === QUICK PRESETS ===
+        if PRESETS:
+            gr.Markdown('<div class="section-label">⚡ Quick presets — pick a starting point</div>')
+            with gr.Row():
+                preset_row = gr.HTML(value=render_preset_chips())
+                # Hidden state to record the last selected preset
+                active_preset = gr.State(value="")
 
         with gr.Row():
             # === LEFT: CONTROLS ===
@@ -734,6 +851,22 @@ def build_ui() -> gr.Blocks:
         )
 
         # === EVENT WIRING ===
+        # Preset click handler: when a preset card is clicked, capture its
+        # data-preset-id attribute, pass it to apply_preset, and update the
+        # question/personas/rounds/banner fields.
+        preset_row.click(
+            apply_preset,
+            inputs=[active_preset],
+            outputs=[question, personas, rounds, status, active_preset],
+            js="""
+            (currentActive) => {
+                const clicked = document.querySelector('.preset-card.clicked');
+                if (!clicked) return [''];
+                return [clicked.getAttribute('data-preset-id')];
+            }
+            """,
+        )
+
         run_btn.click(
             run_debate,
             inputs=[question, personas, rounds, provider_name, model, use_demo],
@@ -781,6 +914,7 @@ def main() -> int:
         server_port=args.port,
         share=args.share,
         css=CUSTOM_CSS,
+        head=PRESET_CLICK_JS,
     )
     return 0
 
