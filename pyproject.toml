@@ -29,6 +29,7 @@ web = [
 
 [project.scripts]
 debate = "debate_arena.cli:main"
+debate-viewer = "debate_arena.viewer:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]

@@ -109,6 +109,29 @@ python examples/web_ui.py --port 8080    # change port
 
 The UI streams the debate panel-by-panel, shows the final synthesis, and lets you download the full transcript as Markdown.
 
+### 🔗 One-click share
+
+After a debate finishes, hit **🔗 Share debate** in the Export tab to get a
+public, read-only URL anyone can view. The shared page renders with the same
+color-coded persona cards as the main UI, and works without signup or login.
+
+```bash
+# Start the share viewer in a separate terminal (port 8001 by default)
+debate-viewer
+
+# Or run it on a different port
+debate-viewer --port 9000
+```
+
+To deploy shares to a public domain, set `DEBATE_SHARE_BASE_URL` and run the
+viewer behind a reverse proxy:
+
+```bash
+export DEBATE_SHARE_BASE_URL=https://debates.your-domain.com
+debate-viewer --host 0.0.0.0 --port 8001
+# Then nginx/Caddy proxy passes /share/* to localhost:8001
+```
+
 ## 📦 Python API
 
 ```python

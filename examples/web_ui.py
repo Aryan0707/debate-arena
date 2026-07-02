@@ -20,6 +20,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "src"))
 import gradio as gr
 
 from debate_arena import DebateArena, DebateConfig
+from debate_arena.models import PersonaTurn
 from debate_arena.personas import PERSONAS_DIR
 from debate_arena.providers import detect_provider, get_provider
 
@@ -94,13 +95,14 @@ def run_debate(
     use_demo: bool,
     progress=gr.Progress(track_tqdm=False),
 ):
-    """Stream the debate as it happens, yielding (status, synthesis, md, chips) tuples."""
+    """Stream the debate as it happens, yielding (status, synthesis, md, chips, share_url) tuples."""
     if not question or not question.strip():
         yield (
             '<div class="status-banner error">⚠️ Please enter a question.</div>',
             "",
             "",
             '<div class="empty-chips">No personas selected</div>',
+            "",
         )
         return
     if not personas:
@@ -109,6 +111,7 @@ def run_debate(
             "",
             "",
             '<div class="empty-chips">No personas selected</div>',
+            "",
         )
         return
 
@@ -123,11 +126,13 @@ def run_debate(
             "",
             "",
             render_persona_chips(personas),
+            "",
         )
         return
 
     arena = DebateArena(provider=provider, stream=False)
 
+    import json as _json
     config = DebateConfig(
         question=question,
         personas=personas,
@@ -135,9 +140,17 @@ def run_debate(
         model=model or None,
         provider=detect_provider(provider_name),
     )
+    config_json = _json.dumps({
+        "personas": config.personas,
+        "rounds": config.rounds,
+        "moderator": config.moderator,
+        "model": config.model,
+        "provider": config.provider,
+    })
 
     transcript_md: list[str] = [f"# 🥊 {question}\n"]
     synthesis_text = ""
+    transcript_turns: list[PersonaTurn] = []
 
     chips_html = render_persona_chips(personas)
     yield (
@@ -145,6 +158,7 @@ def run_debate(
         "",
         "\n".join(transcript_md),
         chips_html,
+        "",
     )
 
     try:
@@ -152,7 +166,6 @@ def run_debate(
         from debate_arena.providers.base import Message, ProviderError
 
         personas_objs = load_personas(config.personas)
-        transcript: list = []
         total_usage: dict = {}
         total_steps = len(personas_objs) + len(personas_objs) * config.rounds + 1
         step = 0
@@ -166,6 +179,7 @@ def run_debate(
                 "",
                 "\n".join(transcript_md),
                 chips_html,
+                "",
             )
 
             turn = arena._run_turn(
@@ -176,7 +190,7 @@ def run_debate(
                 phase="opening",
                 model=config.model,
             )
-            transcript.append(turn)
+            transcript_turns.append(turn)
             meta = PERSONA_META.get(persona.id, {"emoji": "•"})
             transcript_md.append(
                 f"\n## {meta['emoji']} {persona.name} — Round 1 · opening\n\n{turn.content}\n"
@@ -194,12 +208,11 @@ def run_debate(
                     "",
                     "\n".join(transcript_md),
                     chips_html,
+                    "",
                 )
 
-                others = [t for t in transcript if t.persona != persona.id]
-                recent = (
-                    others[-len(personas_objs) :] if len(others) >= len(personas_objs) else others
-                )
+                others = [t for t in transcript_turns if t.persona != persona.id]
+                recent = others[-len(personas_objs):] if len(others) >= len(personas_objs) else others
                 prior_text = [f"[{t.persona}]\n{t.content}" for t in recent]
 
                 turn = arena._run_turn(
@@ -210,7 +223,7 @@ def run_debate(
                     phase="rebuttal",
                     model=config.model,
                 )
-                transcript.append(turn)
+                transcript_turns.append(turn)
                 meta = PERSONA_META.get(persona.id, {"emoji": "•"})
                 transcript_md.append(
                     f"\n## {meta['emoji']} {persona.name} — Round {r} · rebuttal\n\n{turn.content}\n"
@@ -226,6 +239,7 @@ def run_debate(
             "",
             "\n".join(transcript_md),
             chips_html,
+            "",
         )
 
         try:
@@ -234,7 +248,7 @@ def run_debate(
             moderator = load_personas(["engineer"])[0]
 
         full_transcript_text = "\n\n---\n\n".join(
-            f"[{t.persona} — round {t.round} · {t.phase}]\n{t.content}" for t in transcript
+            f"[{t.persona} — round {t.round} · {t.phase}]\n{t.content}" for t in transcript_turns
         )
         try:
             completion = arena.provider.complete(
@@ -272,6 +286,7 @@ def run_debate(
             synthesis_text,
             "\n".join(transcript_md),
             chips_html,
+            config_json,
         )
 
     except ProviderError as e:
@@ -280,6 +295,7 @@ def run_debate(
             synthesis_text,
             "\n".join(transcript_md),
             chips_html,
+            "",
         )
     except Exception as e:
         yield (
@@ -287,7 +303,95 @@ def run_debate(
             synthesis_text,
             "\n".join(transcript_md),
             chips_html,
+            "",
         )
+
+
+def do_share(
+    question: str,
+    synthesis: str,
+    transcript_md: str,
+    config_json: str,
+) -> str:
+    """Create a shareable link for the current debate.
+
+    Called by the '🔗 Share' button. Returns an HTML banner with the URL
+    that the user can click to view the share in the standalone viewer.
+
+    The URL is built from the DEBARE_SHARE_BASE_URL env var if set, otherwise
+    defaults to http://127.0.0.1:8001 (the viewer's default port). To serve
+    shares publicly, set DEBATE_SHARE_BASE_URL=https://your-domain.com and
+    run the viewer behind a reverse proxy.
+    """
+    if not question or not synthesis:
+        return '<div class="status-banner error">⚠️ Run a debate first before sharing.</div>'
+
+    try:
+        import json
+        import re
+        from debate_arena.shares import create_share
+        from debate_arena.models import DebateResult, PersonaTurn
+
+        config = json.loads(config_json) if config_json else {}
+
+        # Parse turns back out of the markdown transcript for storage.
+        turns: list[PersonaTurn] = []
+        for m in re.finditer(
+            r"^## (.+?) — Round (\d+) · (\w+)\n\n(.+?)(?=\n## |\n---|\Z)",
+            transcript_md, re.MULTILINE | re.DOTALL,
+        ):
+            title, round_num, phase, content = m.groups()
+            persona_id = title.split()[-1].lower().replace(" ", "-")
+            turns.append(PersonaTurn(
+                persona=persona_id, round=int(round_num), phase=phase, content=content.strip()
+            ))
+
+        result = DebateResult(
+            question=question,
+            transcript=turns,
+            synthesis=synthesis,
+            config=config,
+            total_usage={},
+        )
+        share = create_share(result)
+        base = os.environ.get("DEBATE_SHARE_BASE_URL", "http://127.0.0.1:8001")
+        url = f"{base.rstrip('/')}/share/{share.id}"
+        return (
+            f'<div class="status-banner success">'
+            f'🔗 <strong>Share link created!</strong> '
+            f'<a href="{url}" target="_blank" class="share-link">View shared debate →</a>'
+            f'<br><code class="share-url">{url}</code>'
+            f'<br><small style="color: #475569;">Start the viewer with: <code>debate-viewer</code> (or <code>uvicorn debate_arena.viewer:app</code>)</small>'
+            f'</div>'
+        )
+    except Exception as e:
+        return f'<div class="status-banner error">❌ Share failed: {type(e).__name__}: {e}</div>'
+
+
+# Add styles for the share link banner
+SHARE_CSS = """
+.share-link {
+    display: inline-block;
+    margin-left: 0.5rem;
+    padding: 0.25rem 0.75rem;
+    background: rgba(255, 255, 255, 0.5);
+    border-radius: 6px;
+    color: #065f46 !important;
+    font-weight: 600;
+    text-decoration: none;
+}
+.share-link:hover { background: white; }
+.share-url {
+    display: block;
+    margin-top: 0.5rem;
+    padding: 0.4rem 0.6rem;
+    background: rgba(255, 255, 255, 0.7);
+    border-radius: 6px;
+    font-size: 0.85rem;
+    color: #065f46;
+    word-break: break-all;
+}
+"""
 
 
 CUSTOM_CSS = """
@@ -566,6 +670,10 @@ def build_ui() -> gr.Blocks:
                         with gr.Row():
                             export_md_btn = gr.Button("📋 Generate .md File", size="md")
                             copy_summary_btn = gr.Button("📑 Copy synthesis only", size="md")
+                            share_btn = gr.Button("🔗 Share debate", size="md", variant="primary")
+                        share_result = gr.HTML(value="")
+                        # Hidden state: stores debate config so we can recreate DebateResult for sharing
+                        share_config = gr.State(value="")
 
         # === EXAMPLES ===
         gr.Examples(
@@ -629,7 +737,7 @@ def build_ui() -> gr.Blocks:
         run_btn.click(
             run_debate,
             inputs=[question, personas, rounds, provider_name, model, use_demo],
-            outputs=[status, synthesis, transcript, chips_preview],
+            outputs=[status, synthesis, transcript, chips_preview, share_config],
         )
 
         export_md_btn.click(
@@ -642,6 +750,12 @@ def build_ui() -> gr.Blocks:
             inputs=[synthesis],
             outputs=[synthesis],
             js="(s) => { navigator.clipboard.writeText(s); return s; }",
+        )
+
+        share_btn.click(
+            do_share,
+            inputs=[question, synthesis, transcript, share_config],
+            outputs=[share_result],
         )
 
     return demo
