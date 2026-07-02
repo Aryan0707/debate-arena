@@ -49,6 +49,19 @@ debate --export debate.md "..."                  # save full transcript
 debate --demo "..."                              # no API, local stubs
 ```
 
+## 🌐 Web UI
+
+A Gradio UI ships with the project:
+
+```bash
+pip install -e ".[web]"
+python examples/web_ui.py                # opens http://127.0.0.1:7860
+python examples/web_ui.py --share        # creates a public gradio.live URL
+python examples/web_ui.py --port 8080    # change port
+```
+
+The UI streams the debate panel-by-panel, shows the final synthesis, and lets you download the full transcript as Markdown.
+
 ## 📦 Python API
 
 ```python

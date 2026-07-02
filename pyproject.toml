@@ -23,6 +23,9 @@ dev = [
     "pytest-cov>=4.1",
     "ruff>=0.6",
 ]
+web = [
+    "gradio>=5.0",
+]
 
 [project.scripts]
 debate = "debate_arena.cli:main"
