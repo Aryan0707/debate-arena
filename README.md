@@ -1,5 +1,12 @@
 # 🥊 Multi-Claude Debate Arena
 
+[![Tests](https://github.com/Aryan0707/debate-arena/actions/workflows/tests.yml/badge.svg)](https://github.com/Aryan0707/debate-arena/actions/workflows/tests.yml)
+[![Lint](https://github.com/Aryan0707/debate-arena/actions/workflows/lint.yml/badge.svg)](https://github.com/Aryan0707/debate-arena/actions/workflows/lint.yml)
+[![Build](https://github.com/Aryan0707/debate-arena/actions/workflows/build.yml/badge.svg)](https://github.com/Aryan0707/debate-arena/actions/workflows/build.yml)
+[![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
+[![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+[![GitHub stars](https://img.shields.io/github/stars/Aryan0707/debate-arena?style=social)](https://github.com/Aryan0707/debate-arena/stargazers)
+
 > Watch AIs argue it out, then get the synthesized answer.
 
 Multi-agent debate system that spawns 3-4 AI agents with different personas (Skeptic, Optimist, Engineer, Devil's Advocate) to argue a question, then synthesizes the best answer. Supports Anthropic Claude, OpenAI, OpenRouter, or any OpenAI-compatible API. Demo mode runs offline with no API.
@@ -140,6 +147,17 @@ temperature: 0.9
 pip install -e ".[dev]"
 pytest -v
 ```
+
+## 🔄 Continuous integration
+
+Every push and PR runs through [GitHub Actions](.github/workflows/):
+
+- **Tests** — 73 tests on Python 3.10, 3.11, 3.12, 3.13
+- **Lint** — ruff check + format check
+- **Build** — sdist + wheel, verified by installing and running the CLI
+- **Dependabot** — weekly PRs for dependency updates
+
+Coverage is uploaded to Codecov on Python 3.12 pushes to main.
 
 ## 📄 License
 
